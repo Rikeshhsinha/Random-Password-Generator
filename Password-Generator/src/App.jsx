@@ -1,4 +1,4 @@
-import { useCallback, useState ,useEffect} from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 
 import "./App.css";
 
@@ -11,6 +11,10 @@ function App() {
 
   const [password, setPassword] = useState("");
 
+  // useRef hook
+
+  const passwordRef = useRef(null);
+
   const passwordGenerator = useCallback(() => {
     let pass = "";
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -19,21 +23,21 @@ function App() {
     if (charecterAllowed) str += "!#$%&'()*+,-./:;<=>?@[]^_`{|}~";
 
     for (let i = 0; i < length; i++) {
-      let char = Math.floor(Math.random() * str.length );
+      let char = Math.floor(Math.random() * str.length);
       pass += str.charAt(char);
-      console.log(pass);
     }
-  
 
     setPassword(pass);
+  }, [length, numberAllowed, charecterAllowed]);
 
+  const copyPasswordToClipboard = useCallback(() => {
+    passwordRef.current?.select();
+    window.navigator.clipboard.writeText(password);
+  }, [password]);
 
-  }, [length, numberAllowed, charecterAllowed, setPassword]);
-
- 
-  useEffect(()=>{
+  useEffect(() => {
     passwordGenerator();
-  },[length,numberAllowed,charecterAllowed,passwordGenerator])
+  }, [length, numberAllowed, charecterAllowed, passwordGenerator]);
   return (
     <>
       <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
@@ -47,9 +51,14 @@ function App() {
               type="text"
               placeholder="Generated Password"
               className="flex-1 bg-slate-700 text-white px-4 py-3 rounded-l-lg outline-none"
+              value={password}
+              ref={passwordRef}
             />
 
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-r-lg transition">
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-r-lg transition"
+              onClick={copyPasswordToClipboard}
+            >
               Copy
             </button>
           </div>
@@ -99,10 +108,6 @@ function App() {
               Include Special Characters
             </label>
           </div>
-
-          {/* <button className="w-full mt-8 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl transition">
-          Generate Password
-        </button> */}
         </div>
       </div>
     </>
